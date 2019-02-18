@@ -6,13 +6,17 @@ const consign = require('consign')
 
 const app = express()
 
+const indexRouter = require('./routes/index.router')
+
 //Conexão NOSql::MongoDB
 // const mongoose  = require('./database')
 
-// Load App
+app.use('/', indexRouter)
+
+// // Load App
 consign({ cwd: 'src' , verbose:false})
     .include('./middleware')
-    .then('./routes')
+    .then('./routes/users.js')
     .into(app)
 
 
@@ -20,10 +24,5 @@ consign({ cwd: 'src' , verbose:false})
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
-
-app.use('/', (req, res) => {
-    res.status(200).send('Rotas Raiz')
-})
-
 
 module.exports = app

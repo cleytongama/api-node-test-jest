@@ -28,4 +28,13 @@ describe('TESTE::Módulo Users', () => {
         expect(data.status).toBe(200)
 
     })
+    test("Erro na rota...", async () => {
+
+        const { get } = await supertest(app)
+
+        const data = await get('/usersaa')
+            
+        expect(data.status).toBe(200)
+
+    })
 })
