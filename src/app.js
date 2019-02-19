@@ -10,7 +10,7 @@ const knex = require('knex')
 
 const knexfile =  require('./knexfile')
 
-const indexRouter = require('./routes/index.router')
+const indexRouter = require('./routes')
 
 //Conexão Postgress
 app.db = knex(knexfile.test)
@@ -23,13 +23,11 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-app.use('/', indexRouter)
-// // Load App
+// Load App
 consign({ cwd: 'src' , verbose:false})
     .include('./middleware')
-    .then('./routes/users.js')
+    .then('./controllers')
+    .then('./routes')
     .into(app)
-
-
 
 module.exports = app

@@ -7,17 +7,17 @@ const UserController = (app) => {
         
             res.status(200).json(users)
         },
-        create:  (req, res) => {
+        create: async (req, res) => {
             
             const data  = req.body
 
-            // const user = await app.db('users').insert(data, '*')
+            const user = await app.db('users').insert(data, '*')
 
-            res.status(201).json(req.body)
+            res.status(201).json(user)
         }
     }
 
     return controller
 }
 
-module.exports = UserController
+module.exports = (app) => UserController(app)

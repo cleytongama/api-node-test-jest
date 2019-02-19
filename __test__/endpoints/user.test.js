@@ -3,23 +3,24 @@ const supertest = require('supertest')
 const app = require('./../../src/app')
 
 describe('TESTE::Módulo Users', () => {
-    test("Deve Listar Usuários", async () => {
+    test.skip("Deve Listar todos os usuários", async () => {
 
         const { get } = await supertest(app)
 
         const data = await get('/users')
 
         expect(data.status).toBe(200)
-        // expect(data.body).toHaveLength(1)
-        // expect(data.body[0]).toHaveProperty('name', 'cleyton')
-        
+
+        expect(data.body.length).toBeGreaterThan(0)        
     })
 
-    test.skip("Deve Adicionar um usuário", async () => {
+    test.only("Deve Adicionar um usuário", async () => {
 
         const { post } = await supertest(app)
 
-        const user = { name: 'john', mail: 'john@gmail.com' }
+        const bodyMail = Math.random(10).toFixed(3)
+
+        const user = { name: 'john', mail: `john${bodyMail}@gmail.com`, passwd: '123123'}
 
         const data = await post('/users')
             .send(user)

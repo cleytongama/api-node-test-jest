@@ -8,4 +8,9 @@ describe(" TEST::App", () => {
         expect(data.status).toBe(200)
         
     })
+    test("router faill", async () => {
+        const request = await supertest(app)
+        const data = await request.get('/routerfaill')
+        expect(data.status).toBe(404)  
+    })
 })
