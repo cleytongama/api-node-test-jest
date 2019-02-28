@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "test:watch": "jest --watchAll --verbose=true",
     "test:coverage": "jest --coverage",
-    "knex:migrate": "knex  migrate:latest --knexfile='src/knexfile.js' --env test"
+    "knex:migrate": "knex  migrate:latest --knexfile='src/knexfile.js' --env test",
+    "knex:migrate:create": "knex  migrate:make --knexfile='src/knexfile.js' --env test"
   },
   "keywords": [],
   "author": "",
