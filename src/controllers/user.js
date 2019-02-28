@@ -20,6 +20,11 @@ const UserController = (app) => {
             if (!data.passwd)
                 return res.status(400).send({ error: 'A senha é uma campo obrigatório' })
 
+            const findUser = await app.db('users').where({ mail: data.mail }).first()
+
+            if (findUser)
+                return res.status(400).send({ error: 'Esse email já esta cadastrado na aplicação' })
+
             const user = await app.db('users').insert(data, '*')
 
             return res.status(201).json(user)

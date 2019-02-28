@@ -2,8 +2,12 @@ const supertest = require('supertest')
 
 const app = require('./../../src/app')
 
+const bodyMail = Math.random(20).toFixed(3)
+
+const mail = `john${bodyMail}@gmail.com`
+
 describe('TESTE::Módulo Users', () => {
-    test.skip("Deve Listar todos os usuários", async () => {
+    test("Deve Listar todos os usuários", async () => {
 
         const { get } = await supertest(app)
 
@@ -12,17 +16,14 @@ describe('TESTE::Módulo Users', () => {
         expect(data.status).toBe(200)
 
         expect(data.body.length).toBeGreaterThan(0)
+
     })
 
-    test.skip("Deve Adicionar um usuário", async () => {
+    test("Deve Adicionar um usuário", async () => {
 
         const { post } = await supertest(app)
 
-        const bodyMail = Math.random(10).toFixed(3)
-
-        const user = { name: 'john', mail: `john${bodyMail}@gmail.com`, passwd: '123123' }
-
-        return;
+        const user = { name: 'john', mail: `${mail}`, passwd: '123123' }
 
         const data = await post('/users')
             .send(user)
@@ -59,14 +60,25 @@ describe('TESTE::Módulo Users', () => {
 
         const { post } = supertest(app)
 
-        const data = await post('/users').send({ name: 'cleyton', mail: 'cleytongama@gmail.com' })
-
+        const data = await post('/users').send({ name: 'cleyton', mail: 'john@gmail.com' })
 
         expect(data.status).toBe(400)
+
         expect(data.body.error).toBe('A senha é uma campo obrigatório')
     })
 
-    test.skip("Erro na rota...", async () => {
+    test("Não deve inserir usuário com email ja existente senha", async () => {
+
+        const { post } = supertest(app)
+
+        const data = await post('/users').send({ name: 'cleyton', mail: `${mail}`, passwd: 'teste' })
+
+        expect(data.status).toBe(400)
+        expect(data.body.error).toBe('Esse email já esta cadastrado na aplicação')
+        
+    })
+
+    test("Erro na rota...", async () => {
 
         const { get } = await supertest(app)
 

@@ -1,5 +1,5 @@
 describe('Trabalho com as assertivas do jest', () => {
-    test('Verficano assertivas', () => {
+    test.skip('Verficano assertivas', () => {
         let number = null
         expect(number).toBeNull()
         number = 11
@@ -9,7 +9,7 @@ describe('Trabalho com as assertivas do jest', () => {
         expect(number).toBeLessThan(12)
     })
     
-    test(' Trabalhando com objetos', () => {
+    test.skip(' Trabalhando com objetos', () => {
         let objeto = {name:'Cleyton', email: 'cleytongama@gmail.com'}
         expect(objeto).toHaveProperty('email')
     })

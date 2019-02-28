@@ -7,7 +7,7 @@ module.exports = {
             user: 'postgres',
             password: 'postgres',
             database: 'barriga',
-            port:'5432'
+            port:'5433'
         }
     },
     migrations: {
