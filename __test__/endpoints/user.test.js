@@ -2,7 +2,7 @@ const supertest = require('supertest')
 
 const app = require('./../../src/app')
 
-const bodyMail = Math.random(20).toFixed(3)
+const bodyMail = Date.now()
 
 const mail = `john${bodyMail}@gmail.com`
 
@@ -21,13 +21,14 @@ describe('TESTE::Módulo Users', () => {
 
     test("Deve Adicionar um usuário", async () => {
 
-        const { post } = await supertest(app)
+        const { post } =  supertest(app)
 
         const user = { name: 'john', mail: `${mail}`, passwd: '123123' }
 
+        console.log(user)
+
         const data = await post('/users')
             .send(user)
-            .set('Accept', 'application/json')
 
         expect(data.status).toBe(201)
 

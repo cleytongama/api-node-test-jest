@@ -8,26 +8,16 @@ const UserController = (app) => {
             res.status(200).json(users)
         },
         create: async (req, res) => {
+            try {
+                const data = req.body
+                const user = await app.services.user.create(data)
 
-            const data = req.body
+                return res.status(201).json(user)
 
-            if (!data.name)
-                return res.status(400).send({ error: 'Nome é um atributo obrigatório' })
+            } catch (error) {
+                return res.status(400).send({ error: error.message })
+            }
 
-            if (!data.mail)
-                return res.status(400).send({ error: 'Email é um campo obrigatório' })
-
-            if (!data.passwd)
-                return res.status(400).send({ error: 'A senha é uma campo obrigatório' })
-
-            const findUser = await app.db('users').where({ mail: data.mail }).first()
-
-            if (findUser)
-                return res.status(400).send({ error: 'Esse email já esta cadastrado na aplicação' })
-
-            const user = await app.db('users').insert(data, '*')
-
-            return res.status(201).json(user)
         }
     }
 

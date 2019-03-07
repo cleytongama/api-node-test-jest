@@ -26,6 +26,7 @@ app.use(morgan('dev'))
 // Load App
 consign({ cwd: 'src' , verbose:false})
     .include('./middleware')
+    .then('./services')
     .then('./controllers')
     .then('./routes')
     .into(app)

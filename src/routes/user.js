@@ -2,7 +2,7 @@ const UserRouter = (app) => {
 
     const { query, create } = app.controllers.user
 
-    return app.route('/users')
+    app.route('/users')
         .get(query)
         .post(create)
 }
