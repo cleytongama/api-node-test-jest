@@ -2,10 +2,18 @@ const ValidationError = require('./../errors/ValidationError')
 
 const UserService = (app) => {
     return {
+        query: async () => {
+            try {
+                const users = await app.db('users').select()
+                return users
+            } catch (err) {
+                throw new ValidationError('Erro ao listar usuários')
+            }
+        },
         create: async (user) => {
 
             if (!user.name)
-                throw new  ValidationError('Nome é um atributo obrigatório')
+                throw new ValidationError('Nome é um atributo obrigatório')
 
             if (!user.mail)
                 throw new ValidationError('Email é um campo obrigatório')

@@ -8,9 +8,7 @@ const app = express()
 
 const knex = require('knex')
 
-const knexfile =  require('./knexfile')
-
-const indexRouter = require('./routes')
+const knexfile = require('./knexfile')
 
 //Conexão Postgress
 app.db = knex(knexfile.test)
@@ -23,12 +21,21 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
+
 // Load App
-consign({ cwd: 'src' , verbose:false})
+consign({ cwd: 'src', verbose: false })
     .include('./middleware')
     .then('./services')
     .then('./controllers')
     .then('./routes')
     .into(app)
+
+app.use((err, req, res, next) => {
+    if (err.name === 'ValidationError') {
+        res.status(400).send({ error: err.message })
+    }else{
+        res.status(500).send({ error: 'Ops!! Ocorreu algum erro no servidor' })
+    }
+})
 
 module.exports = app

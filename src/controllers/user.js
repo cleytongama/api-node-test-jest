@@ -1,13 +1,15 @@
 const UserController = (app) => {
 
     const controller = {
-        query: async (req, res) => {
-
-            const users = await app.db('users').select()
-
-            res.status(200).json(users)
+        query: async (req, res, next) => {
+            try {
+                const users = await app.services.user.query()
+                return res.status(200).json(users)
+            } catch (error) {
+                return next(error)
+            }
         },
-        create: async (req, res) => {
+        create: async (req, res, next) => {
             try {
                 const data = req.body
                 const user = await app.services.user.create(data)
@@ -15,7 +17,7 @@ const UserController = (app) => {
                 return res.status(201).json(user)
 
             } catch (error) {
-                return res.status(400).send({ error: error.message })
+                return next(error)
             }
 
         }
