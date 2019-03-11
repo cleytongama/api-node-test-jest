@@ -1,6 +1,6 @@
 const supertest = require('supertest')
 
-const app = require('./../../src/app')
+const app = require('../../src/app')
 
 const bodyMail = Date.now()
 
@@ -21,16 +21,33 @@ describe('TESTE::Módulo Users', () => {
 
     test("Deve Adicionar um usuário", async () => {
 
-        const { post } =  supertest(app)
+        const { post } = supertest(app)
 
         const user = { name: 'john', mail: `${mail}`, passwd: '123123' }
-
-        console.log(user)
 
         const data = await post('/users')
             .send(user)
 
         expect(data.status).toBe(201)
+        expect(data.body[0].name).toBe('john')
+        expect(data.body[0]).not.toHaveProperty('passwd')
+
+    })
+
+    test("Deve retornar uma senha criptografada", async () => {
+
+        const { post } = supertest(app)
+
+        const user = await post('/users').send({ name: 'Paulo', mail: `${Date.now()}@mail.com`, passwd: '123123' })
+
+        expect(user.status).toBe(201)
+
+        const { id } = user.body[0]
+
+        const userDB = await app.services.user.findOne({ id })
+
+        expect(userDB.passwd).not.toBeUndefined()
+        expect(userDB.passwd).not.toBe('123123')
 
     })
 
@@ -76,7 +93,7 @@ describe('TESTE::Módulo Users', () => {
 
         expect(data.status).toBe(400)
         expect(data.body.error).toBe('Esse email já esta cadastrado na aplicação')
-        
+
     })
 
     test("Erro na rota...", async () => {

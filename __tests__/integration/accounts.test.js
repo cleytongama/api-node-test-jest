@@ -1,5 +1,5 @@
 const supertest = require('supertest')
-const app = require('./../../src/app')
+const app = require('../../src/app')
 
 const END_POINT = '/accounts'
 let user;

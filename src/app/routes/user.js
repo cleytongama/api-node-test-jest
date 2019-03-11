@@ -1,9 +1,10 @@
 const UserRouter = (app) => {
 
     const { query, create } = app.controllers.user
+    const { authenticate } = app.middlewares.passport
 
     app.route('/users')
-        .get(query)
+        .get(query, authenticate())
         .post(create)
 }
 
