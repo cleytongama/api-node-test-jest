@@ -9,37 +9,27 @@ const PassportMiddleware = ((app) => {
 
     const params = {
         secretOrKey: secrect,
-        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-        passReqToCallback: true
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
     }
 
-    const strategy = new Strategy(params, (req, payload, done) => {
+    const strategy = new Strategy(params, async (payload, done) => {
+        try {
+            
+            const user = await app.services.user.findOne({ id: payload.id })
 
-        console.log(req)
-        console.log(payload)
-        app.services.user.findOne({ id: payload.id })
-            .then((user) => {
-                if (user) done(null, { ...payload })
+            if (user) done(null, user);
 
-                else done(null, false)
-            }).catch(err => done(null, false))
-        // try {
-        //     const user = await app.services.user.findOne({ id: payload.id })
+            else done(null, false);
 
-        //     console.log(user, payload)
-        //     if (user) done(null, { ...payload })
-
-        //     else done(null, false)
-        // } catch (error) {
-        //     console.log(error)
-        //     done(error, false)
-        // }
+        } catch (err) {
+            done(err);
+        }
     })
 
-    passport.use(strategy)
+    passport.use(strategy);
 
     return {
-        authenticate: () => passport.authenticate('jwt', { session: false }, (a) => console.log(a))
+        authenticate: () => passport.authenticate('jwt', { session: false })
     }
 })
 

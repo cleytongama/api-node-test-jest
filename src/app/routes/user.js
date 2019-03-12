@@ -4,7 +4,8 @@ const UserRouter = (app) => {
     const { authenticate } = app.middlewares.passport
 
     app.route('/users')
-        .get(query, authenticate())
+        .all(authenticate())
+        .get(query)
         .post(create)
 }
 

@@ -1,13 +1,19 @@
 const supertest = require('supertest')
 const app = require('../../src/app')
-
+const jwt = require('jsonwebtoken')
 const END_POINT = '/accounts'
+
 let user;
+const secretJWT = '123123'
 
 beforeAll(async () => {
     const data = { name: 'john1', mail: `${Date.now()}@gmail.com`, passwd: '123123' }
     const res = await app.services.user.create(data)
-    user = { ...res[0] }
+    const payload = { ...res[0] }
+
+    const token = await jwt.sign(payload, secretJWT)
+
+    user = { ...payload, token }
 })
 
 // Cada suit de test deve ser independent...
@@ -18,6 +24,7 @@ describe("Módulo :: Accounts", () => {
         const account = await post(END_POINT)
             .send({ name: 'Acc #1', user_id: user.id })
             .set('Accept', 'application/json')
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(account.status).toBe(201)
         expect(account.body[0].name).toBe('Acc #1')
@@ -28,6 +35,7 @@ describe("Módulo :: Accounts", () => {
         const { post } = supertest(app)
         const account = await post(END_POINT)
             .send({ user_id: user.id })
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(account.status).toBe(400)
         expect(account.body.error).toBe('Nome é um atributo obrigatório')
@@ -47,9 +55,9 @@ describe("Módulo :: Accounts", () => {
         const { get } = supertest(app)
 
         const accounts = await get(END_POINT)
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(accounts.status).toBe(200)
-
         expect(accounts.body.length).toBeGreaterThan(0)
     })
 
@@ -67,6 +75,7 @@ describe("Módulo :: Accounts", () => {
 
         const { get } = supertest(app)
         const result = await get(`${END_POINT}/${account[0].id}`)
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(result.status).toBe(200)
         expect(result.body.name).toBe("Acc 11")
@@ -84,6 +93,7 @@ describe("Módulo :: Accounts", () => {
 
         const result = await put(`${END_POINT}/${account[0].id}`)
             .send({ name: 'Acc 11 updated!!!' })
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(result.status).toBe(200)
         expect(result.body[0].name).toBe('Acc 11 updated!!!')
@@ -95,7 +105,9 @@ describe("Módulo :: Accounts", () => {
             user_id: user.id
         }, ['id'])
 
-        const result = await supertest(app).delete(`${END_POINT}/${account[0].id}`)
+        const result = await supertest(app)
+            .delete(`${END_POINT}/${account[0].id}`)
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(result.status).toBe(204)
 

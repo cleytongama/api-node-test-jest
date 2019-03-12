@@ -1,10 +1,19 @@
 const supertest = require('supertest')
-
+const jwt = require('jsonwebtoken')
 const app = require('../../src/app')
 
-const bodyMail = Date.now()
+const mail = `john${Date.now()}@gmail.com`
+const secretJWT = '123123'
+let user;
 
-const mail = `john${bodyMail}@gmail.com`
+beforeAll(async () => {
+    const data = { name: 'john1', mail: `${Date.now()}@gmail.com`, passwd: '123123' }
+    const res = await app.services.user.create(data)
+    const paylod = { ...res[0] }
+    const token = await jwt.sign(paylod, secretJWT)
+
+    user = { ...paylod, token }
+})
 
 describe('TESTE::Módulo Users', () => {
     test("Deve Listar todos os usuários", async () => {
@@ -12,6 +21,7 @@ describe('TESTE::Módulo Users', () => {
         const { get } = await supertest(app)
 
         const data = await get('/users')
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(data.status).toBe(200)
 
@@ -23,10 +33,11 @@ describe('TESTE::Módulo Users', () => {
 
         const { post } = supertest(app)
 
-        const user = { name: 'john', mail: `${mail}`, passwd: '123123' }
+        const userCreate = { name: 'john', mail: `${mail}`, passwd: '123123' }
 
         const data = await post('/users')
-            .send(user)
+            .send(userCreate)
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(data.status).toBe(201)
         expect(data.body[0].name).toBe('john')
@@ -38,11 +49,13 @@ describe('TESTE::Módulo Users', () => {
 
         const { post } = supertest(app)
 
-        const user = await post('/users').send({ name: 'Paulo', mail: `${Date.now()}@mail.com`, passwd: '123123' })
+        const result = await post('/users')
+            .send({ name: 'Paulo', mail: `${Date.now()}@mail.com`, passwd: '123123' })
+            .set('Authorization', `Bearer ${user.token}`)
 
-        expect(user.status).toBe(201)
+        expect(result.status).toBe(201)
 
-        const { id } = user.body[0]
+        const { id } = result.body[0]
 
         const userDB = await app.services.user.findOne({ id })
 
@@ -54,7 +67,9 @@ describe('TESTE::Módulo Users', () => {
     test("Não deve inserir usuário sem nome", async () => {
         const { post } = supertest(app)
 
-        const data = await post('/users').send({ passwd: '123123' })
+        const data = await post('/users')
+            .send({ passwd: '123123' })
+            .set('Authorization', `Bearer ${user.token}`)
 
         expect(data.status).toBe(400)
 
@@ -66,7 +81,9 @@ describe('TESTE::Módulo Users', () => {
 
         const { post } = supertest(app)
 
-        const data = await post('/users').send({ name: 'Cleyton', passwd: 'teste' })
+        const data = await post('/users')
+            .set('Authorization', `Bearer ${user.token}`)
+            .send({ name: 'Cleyton', passwd: 'teste' })
 
         expect(data.status).toBe(400)
 
@@ -78,7 +95,9 @@ describe('TESTE::Módulo Users', () => {
 
         const { post } = supertest(app)
 
-        const data = await post('/users').send({ name: 'cleyton', mail: 'john@gmail.com' })
+        const data = await post('/users')
+            .set('Authorization', `Bearer ${user.token}`)
+            .send({ name: 'cleyton', mail: 'john@gmail.com' })
 
         expect(data.status).toBe(400)
 
@@ -89,7 +108,9 @@ describe('TESTE::Módulo Users', () => {
 
         const { post } = supertest(app)
 
-        const data = await post('/users').send({ name: 'cleyton', mail: `${mail}`, passwd: 'teste' })
+        const data = await post('/users')
+            .set('Authorization', `Bearer ${user.token}`)
+            .send({ name: 'cleyton', mail: `${mail}`, passwd: 'teste' })
 
         expect(data.status).toBe(400)
         expect(data.body.error).toBe('Esse email já esta cadastrado na aplicação')
