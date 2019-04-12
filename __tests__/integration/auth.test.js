@@ -4,7 +4,7 @@ const app = require('./../../src/app')
 
 describe("Módule :: Auth", () => {
 
-    test.only("Deve criar usuário via signup", async () => {
+    test("Deve criar usuário via signup", async () => {
         const { post } = supertest(app)
 
         const user = await post('/auth/signup')
@@ -23,11 +23,12 @@ describe("Módule :: Auth", () => {
 
         const mail = `${Date.now()}gmail.com`
 
-        const user = await post('/users')
+        const user = await post('/auth/signup')
             .send({ name: 'Cleyton', mail, passwd: '123123' })
-
+            
         const login = await post('/auth/signin')
             .send({ mail: mail, passwd: '123123' })
+
 
         expect(login.status).toBe(200)
         expect(login.body).toHaveProperty('token')
@@ -40,7 +41,7 @@ describe("Módule :: Auth", () => {
 
         const mail = `${Date.now()}gmail.com`
 
-        await post('/users')
+        await post('/auth/signup')
             .send({ name: 'Cleyton', mail, passwd: '123123' })
 
         const login = await post('/auth/signin')
@@ -56,7 +57,7 @@ describe("Módule :: Auth", () => {
 
         const mail = `${Date.now()}gmail.com`
 
-        await post('/users')
+        await post('/auth/signup')
             .send({ name: 'Cleyton', mail, passwd: '123123' })
 
         const login = await post('/auth/signin')
@@ -71,8 +72,7 @@ describe("Módule :: Auth", () => {
 
         const users = await get('/users')
             .set('Authorization', 'Bearer ' + 'token')
-        console.log(users.body)
-
+        
         expect(users.status).toBe(401)
     })
 
