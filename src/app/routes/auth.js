@@ -1,13 +1,17 @@
+const express = require('express')
+
 const AuthRoute = (app) => {
 
+    const router = express.Router()
+    
     const { signin } = app.controllers.auth
     const { create } = app.controllers.user
 
-    app.route('/auth/signin')
-        .post(signin)
+    router.post('/signin', signin)
 
-    app.route('/auth/signup')
-        .post(create)
+    router.post('/signup', create)
+
+    return router
 }
 
 module.exports = (app) => AuthRoute(app)

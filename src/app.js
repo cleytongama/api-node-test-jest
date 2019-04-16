@@ -19,6 +19,7 @@ consign({ cwd: 'src/app', verbose: false })
     .then('./services')
     .then('./controllers')
     .then('./routes')
+    .then('./config/router.js')
     .into(app)
 
 app.use((err, req, res, next) => {

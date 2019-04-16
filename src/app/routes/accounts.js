@@ -1,18 +1,17 @@
+const express = require('express')
+
 const AccountRouter = (app) => {
 
+    const router =  express.Router()
     const { create, query, getById, update, remove } = app.controllers.account
-    const { authenticate } = app.middlewares.passport
     
-    app.route('/accounts')
-        .all(authenticate())
-        .post(create)
-        .get(query)
+    router.post('/', create)
+    router.get('/', query)
+    router.get('/:id', getById)
+    router.put('/:id', update)
+    router.delete('/:id', remove)
 
-    app.route('/accounts/:id')
-        .all(authenticate())
-        .get(getById)
-        .put(update)
-        .delete(remove)
+    return router
 }
 
 module.exports = (app) => AccountRouter(app)
