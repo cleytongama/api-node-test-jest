@@ -4,25 +4,29 @@ const jwt = require('jsonwebtoken')
 const END_POINT = '/accounts'
 
 let user;
+let user2;
 const secretJWT = '123123'
 
-beforeAll(async () => {
-    const data = { name: 'john1', mail: `${Date.now()}@gmail.com`, passwd: '123123' }
-    const res = await app.services.user.create(data)
-    const payload = { ...res[0] }
+beforeEach(async() => {
 
-    const token = await jwt.sign(payload, secretJWT)
+    const res = await app.services.user.create({ name: 'john1', mail: `${Date.now()}@gmail.com`, passwd: '123123' })
+    const res2 = await app.services.user.create({ name: 'cleyton', mail: `${Date.now()}@gmail.com`, passwd: '123123' })
 
-    user = { ...payload, token }
+    const token = await jwt.sign({...res[0] }, secretJWT)
+    const token2 = await jwt.sign({...res2[0] }, secretJWT)
+
+    user = {...res[0], token }
+    user2 = {...res2[0], token2 }
 })
 
 // Cada suit de test deve ser independent...
 describe("Módulo :: Accounts", () => {
-    test("Deve inserir uma conta com sucesso", async () => {
+
+    test("Deve inserir uma conta com sucesso", async() => {
         const { post } = supertest(app)
 
         const account = await post(END_POINT)
-            .send({ name: 'Acc #1', user_id: user.id })
+            .send({ name: 'Acc #1' })
             .set('Accept', 'application/json')
             .set('Authorization', `Bearer ${user.token}`)
 
@@ -31,26 +35,21 @@ describe("Módulo :: Accounts", () => {
     })
 
 
-    test("Não deve inserir um usuário sem nome", async () => {
+    test("Não deve inserir um usuário sem nome", async() => {
         const { post } = supertest(app)
         const account = await post(END_POINT)
-            .send({ user_id: user.id })
+            .send({})
             .set('Authorization', `Bearer ${user.token}`)
 
         expect(account.status).toBe(400)
         expect(account.body.error).toBe('Nome é um atributo obrigatório')
 
     })
-
-    test.skip("Não deve inserir uma conta de nome duplicado, para o mesmo usuário", () => {
-
-    })
-
-    test("Deve Listar todas as contas", async () => {
-        const account = await app.db("accounts").insert({
-            name: "Acc #2",
-            user_id: user.id
-        }, '*')
+    test("Deve listar apenas as contas do usuário", async() => {
+        const accountsCreated = await app.db('accounts').insert([
+            { name: "Acc User1#", user_id: user.id },
+            { name: "Acc User2#", user_id: user2.id }
+        ], '*')
 
         const { get } = supertest(app)
 
@@ -58,15 +57,11 @@ describe("Módulo :: Accounts", () => {
             .set('Authorization', `Bearer ${user.token}`)
 
         expect(accounts.status).toBe(200)
-        expect(accounts.body.length).toBeGreaterThan(0)
+        expect(accounts.body.length).toBe(1)
+        expect(accounts.body[0].name).toBe("Acc User1#")
+
     })
-
-    test.skip("Deve listar apenas as contas do usuário", () => { })
-    test.skip("Não deve retornar a conta de outro usuário", () => { })
-    test.skip("Não deve alterar a conta de outro usuário", () => { })
-    test.skip("Não deve remover a conta de outro usuário", () => { })
-
-    test("Deve retornar um conta por ID", async () => {
+    test("Deve retornar um conta por ID", async() => {
 
         const account = await app.db('accounts').insert({
             name: "Acc 11",
@@ -83,7 +78,7 @@ describe("Módulo :: Accounts", () => {
 
     })
 
-    test("Devo alterar uma conta", async () => {
+    test("Devo alterar uma conta", async() => {
         const account = await app.db('accounts').insert({
             name: "Acc 11 update",
             user_id: user.id
@@ -99,7 +94,7 @@ describe("Módulo :: Accounts", () => {
         expect(result.body[0].name).toBe('Acc 11 updated!!!')
     })
 
-    test("Deve remover uma conta", async () => {
+    test("Deve remover uma conta", async() => {
         const account = await app.db('accounts').insert({
             name: "Acc 11 update",
             user_id: user.id
@@ -112,5 +107,14 @@ describe("Módulo :: Accounts", () => {
         expect(result.status).toBe(204)
 
     })
+
+    test.skip("Não deve inserir uma conta de nome duplicado, para o mesmo usuário", () => {
+
+    })
+    test.skip("Não deve retornar a conta de outro usuário", () => {})
+    test.skip("Não deve alterar a conta de outro usuário", () => {})
+    test.skip("Não deve remover a conta de outro usuário", () => {})
+
+
 
 })

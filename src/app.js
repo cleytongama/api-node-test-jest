@@ -22,7 +22,7 @@ consign({ cwd: 'src/app', verbose: false })
     .into(app)
 
 app.use((err, req, res, next) => {
-    const {name, message } = err
+    const { name, message, stack } = err
 
     if (name === 'ValidationError') {
         return res.status(400).send({ error: message })

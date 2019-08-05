@@ -2,25 +2,25 @@ const ValidationError = require('./../errors/ValidationError')
 
 const AccountService = ((app) => {
 
-    const query = async () => {
-        return await app.db('accounts').select()
+    const query = async(user_id) => {
+        return await app.db('accounts').where({ user_id })
     }
-    const create = async (account) => {
+    const create = async(account) => {
 
         if (!account.name)
             throw new ValidationError('Nome é um atributo obrigatório')
 
         return await app.db('accounts').insert(account, '*')
     }
-    const getById = async (filter = {}) => {
+    const getById = async(filter = {}) => {
         return await app.db('accounts').where(filter).first()
     }
-    const update = async (id, account) => {
+    const update = async(id, account) => {
         return await app.db('accounts').where({
             id
         }).update(account, '*')
     }
-    const remove = async (id) => {
+    const remove = async(id) => {
         return await app.db('accounts').where({ id }).del()
     }
 
