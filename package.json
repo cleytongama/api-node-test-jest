@@ -19,7 +19,7 @@
     "nodemon": "^1.18.10"
   },
   "dependencies": {
-    "bcrypt": "3.0.4",
+    "bcrypt": "5.0.0",
     "consign": "0.1.6",
     "express": "^4.16.4",
     "jest": "^24.1.0",
