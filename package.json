@@ -21,7 +21,7 @@
   "dependencies": {
     "bcrypt": "3.0.4",
     "consign": "0.1.6",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "jest": "^24.1.0",
     "jsonwebtoken": "^8.5.0",
     "knex": "0.15.2",
