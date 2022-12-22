@@ -23,7 +23,7 @@
     "consign": "0.1.6",
     "express": "^4.16.4",
     "jest": "^24.1.0",
-    "jsonwebtoken": "^8.5.0",
+    "jsonwebtoken": "^9.0.0",
     "knex": "0.15.2",
     "mongoose": "^5.4.13",
     "morgan": "^1.9.1",
